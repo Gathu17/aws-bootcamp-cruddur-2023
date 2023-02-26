@@ -61,5 +61,31 @@ aws sns subscribe \
 The subscription will appear as follows
 ![Screenshot 2023-02-19 205452](https://user-images.githubusercontent.com/92152669/221418063-258570e1-b37a-4df0-9e08-ef576a6c84e0.png)
 
+#### Created a billing alarm
 
+The following commands will create an alarm.
+```
+aws cloudwatch put-metric-alarm --cli-input-json file://aws/json/alarm-config.json
+
+```
+The alarm configuration file can be found [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/aws/json/alarm-config.json)
+
+![Screenshot 2023-02-19 211639](https://user-images.githubusercontent.com/92152669/221418765-140406e7-0e7e-4f85-9faf-c9228c4221b2.png)
+
+
+## Architectural Diagrams
+During the course of the week I recreated a logical and conceptual architectural diagram for the Cruddur application.
+
+The requirements were as follows:
+- A production ready web app
+- API based using the RESTful architecture
+- Frontend built using React(Javascript) and Backend built using Python(Django)
+- Momento is used as a caching system
+- Authentication using Cognito
+
+#### Logical architectural diagram
+![Blank diagram (1)](https://user-images.githubusercontent.com/92152669/221418833-f7810bbc-50e0-4051-b873-aaa9b27abd00.png)
+
+[Link to logical architectural diagram](https://lucid.app/lucidchart/188f89b7-10e0-498b-b358-c42a3acccd5c/edit?viewport_loc=-65%2C111%2C1792%2C825%2C0_0&invitationId=inv_3bd184f2-cff2-4721-852b-e7f7d1f37eba)
+[Link to napkin design](https://lucid.app/lucidchart/2a0aa5b4-eb09-4ed0-aa91-3ae131f65447/edit?viewport_loc=-148%2C-186%2C2036%2C938%2C0_0&invitationId=inv_39cc560d-fc86-4cb7-a9f4-71fea7c7b141)
 
