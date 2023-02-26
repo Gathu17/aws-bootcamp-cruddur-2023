@@ -19,3 +19,13 @@ The following are the week's objectives that were accomplished:
  
  ### Creating IAM user and user group 
  An IAM user is a resource in IAM(Identity Access and Management) that has associated credentials and permissions. An IAM user ccan represent a person or application that uses its credentials to make AWS requests. It is advisable to use the IAM user rather that the root user since if the IAM user is compromised one can easily delete the user or limit the policy attached to the user. Policies are assigned to either an IAM user or IAM role or IAM group and consist of what the entity can/can not do.
+ I created an IAM user as shown below.
+ ![Screenshot 2023-02-19 184616](https://user-images.githubusercontent.com/92152669/221417170-4c789be0-b341-4400-8a92-499d2647c59c.png)
+ 
+ ### AWS Organisation 
+ When one has multiple AWS accounts it starts to become tedious to manage and keep track of all these accounts. That is where AWS Organisation comes in. It helps one to   manage policies and billings plus other services in one central management account. Your root user account will be your management account.
+ The following is the organisation I created
+ ![Screenshot 2023-02-19 184813](https://user-images.githubusercontent.com/92152669/221417204-965c9406-75a0-4b0b-b3d4-8592e32694a1.png)
+
+ 
+ 
