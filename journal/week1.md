@@ -27,7 +27,13 @@ There are two main components of Docker:
   - **Snyk Opensource Security.** Identifies vulnerabilities on Docker compose.
   - **AWS Secret manager**.Stores and manages secrets.
   - **Hashicorp Vault**. Enables one to manage secrets without storing in Docer compose.
-  - 
+  - **AWS Inspector/clair**. Image vulnerability scanning.
+  - **Snyk Container Security**. Alternative tool used to scan images for vulnerabilities.
+
+I created a Snyk account that scanned the repository for vulnerabilities.
+![Capture](https://user-images.githubusercontent.com/92152669/221453464-95aed57d-bcc7-43ed-b778-260cf535f96e.PNG)
+
+### Containerizing our applications
 To containerize our application using Docker we will need to create a Dockerfile for bothe frontend and backend. We will
 also need to create a docer compose file that would be able to run both containers with a single command.
 The Dockerfile for the frontend is as follows
