@@ -21,7 +21,13 @@ There are two main components of Docker:
  - No secrets in the Docker file and images
  - Read only file system and volume in Docker.
  - Having separate databases for long term storage
- - 
+ - Ensuring that the code is tested for vulnerabilities before production.
+ 
+ Some of the tools that can be used in container security include:
+  - **Snyk Opensource Security.** Identifies vulnerabilities on Docker compose.
+  - **AWS Secret manager**.Stores and manages secrets.
+  - **Hashicorp Vault**. Enables one to manage secrets without storing in Docer compose.
+  - 
 To containerize our application using Docker we will need to create a Dockerfile for bothe frontend and backend. We will
 also need to create a docer compose file that would be able to run both containers with a single command.
 The Dockerfile for the frontend is as follows
