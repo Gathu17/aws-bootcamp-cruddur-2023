@@ -5,6 +5,23 @@ The second week of the bootcamp focused on containerzitaion. The following are t
  - AWS CLI. The AWS CLI needs to be installed in the terminal.
 
 ### Docker
+
+## Container Security
+It is the practice of protecting your applicatrions on compute services such as a container. By using containers it reduces the impact of breach by separating the applications from other related services. Managed container services means that the security responsibility is focused on a few things. Unmanaged containers require more hours and constant monitoring of containers.
+
+### Docker components 
+There are two main components of Docker:
+ - Docker client. This is where Docker has been installed and ran as a service.
+ - Docker server. This is where the containers are docked.
+ 
+### Security Best Practices
+ - Host and Docker should be kept updated with the latest security patches.
+ - Docker daemon and containers should run in non-root user.
+ - Trusting a public and private registry. 
+ - No secrets in the Docker file and images
+ - Read only file system and volume in Docker.
+ - Having separate databases for long term storage
+ - 
 To containerize our application using Docker we will need to create a Dockerfile for bothe frontend and backend. We will
 also need to create a docer compose file that would be able to run both containers with a single command.
 The Dockerfile for the frontend is as follows
