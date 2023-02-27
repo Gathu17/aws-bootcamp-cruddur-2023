@@ -164,8 +164,16 @@ aws dynamodb scan --table-name Music --query "Items" --endpoint-url http://local
 ```
 ### Testing PostgreSQL
 To test the Database one would need to install postgreSQL in the terminal. This would include adding it to tasks in the [gitpod.yml](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/.gitpod.yml)
-Once installed the database can be tested with the following command:
+Once installed the database can be tested from the client with the following command:
 ```
 psql -Upostgres --host localhost
-```
 
+```
+An alternative would be to use PostgreSQL extension to explore the database.
+
+
+## Free Tier Cloud Development Environments
+ - Gitpod
+ - Github Codespaces
+ - AWS Cloud9
+ - 
