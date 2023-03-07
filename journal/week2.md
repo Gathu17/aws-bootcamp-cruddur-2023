@@ -72,3 +72,38 @@ span.set_attribute("app.result_lenghth", len(return_data))
 ```
 Below are the spans I created
 ![Screenshot (2130)](https://user-images.githubusercontent.com/92152669/223392650-b23a14c3-fc0b-4757-9b54-8f01ae7cc84c.png)
+
+## X-Ray
+#### Installing
+Add the ``` aws-xray-sdk``` in requirements.txt file of backend.
+
+The following code was inserted in ```app.py```
+```
+# Xray
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
+
+xray_url = os.getenv("AWS_XRAY_URL")
+xray_recorder.configure(service='backend-flask', dynamic_naming=xray_url)
+
+```
+I started a subsegment in the notifications_activities.py module as shown
+```
+from aws_xray_sdk.core import xray_recorder
+
+    # Start a subsegment
+    subsegment = xray_recorder.begin_segment('notification_activities')
+    #x-ray
+    dict = {
+      "now": now.isoformat(),
+      "result_size": len(results)
+    }
+    subsegment.put_metadata('key', dict, 'namespace')
+    
+```
+It appeared as folows in AWS console
+![Screenshot (2136)](https://user-images.githubusercontent.com/92152669/223483259-db44d874-0f55-4df9-9067-15df294ecb8e.png)
+![Screenshot (2137)](https://user-images.githubusercontent.com/92152669/223483573-f9b58a36-6267-4a5c-a41b-fd3c4951bc1a.png)
+
+
+
