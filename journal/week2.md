@@ -90,7 +90,12 @@ xray-daemon:
       - 2000:2000/udp
       
 ```
-and the followingt env vars 
+and the following env vars were inserted in the backend service
+```
+AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
+AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
+
+```
 
 The following code was inserted in ```app.py```
 ```
@@ -119,6 +124,10 @@ from aws_xray_sdk.core import xray_recorder
 It appeared as folows in AWS console
 ![Screenshot (2136)](https://user-images.githubusercontent.com/92152669/223483259-db44d874-0f55-4df9-9067-15df294ecb8e.png)
 ![Screenshot (2137)](https://user-images.githubusercontent.com/92152669/223483573-f9b58a36-6267-4a5c-a41b-fd3c4951bc1a.png)
+
+## Cloudwatch
+Amazon Cloudwatch allows us to collect and visualize real time data.
+
 
 
 
