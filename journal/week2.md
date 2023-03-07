@@ -43,3 +43,32 @@ FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
 
 ```
+Add the env vars to ```docker-compose.yml```
+```
+OTEL_SERVICE_NAME: 'cruddur'
+OTEL_EXPORTER_OTLP_ENDPOINT: "https://api.honeycomb.io"
+OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=${HONEYCOMB_API_KEY}"
+
+```
+After running docker-compose the following dataset would be seen in your HoneyComb console
+![Screenshot (2129)](https://user-images.githubusercontent.com/92152669/223391995-332a1b4c-044e-4f34-ab14-22799fc723c1.png)
+
+The API key can be found in your environment from your honeycomb account.
+To create a span and attribute. The following code will be added to your services module.
+```
+from opentelemetry import trace
+tracer = trace.get_tracer("home-activities")
+
+with tracer.start_as_current_span("home-activities-mock-data"):
+    span = trace.get_current_span()
+    
+span.set_attribute("app.now", now.isoformat())
+
+```
+and at the end of the code
+```
+span.set_attribute("app.result_lenghth", len(return_data))
+
+```
+Below are the spans I created
+![Screenshot (2130)](https://user-images.githubusercontent.com/92152669/223392650-b23a14c3-fc0b-4757-9b54-8f01ae7cc84c.png)
