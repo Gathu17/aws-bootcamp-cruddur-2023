@@ -126,7 +126,49 @@ It appeared as folows in AWS console
 ![Screenshot (2137)](https://user-images.githubusercontent.com/92152669/223483573-f9b58a36-6267-4a5c-a41b-fd3c4951bc1a.png)
 
 ## Cloudwatch
-Amazon Cloudwatch allows us to collect and visualize real time data.
+Amazon Cloudwatch allows us to collect and visualize real time data. I configured logger in Python to use Cloudwatch.
+
+#### Installation
+Add the following to requirements.txt and install
+```
+watchtower
+
+```
+In ```app.py``` the following code was added
+```
+import watchtower
+import logging
+from time import strftime
+
+# Configuring Logger to Use CloudWatch
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
+console_handler = logging.StreamHandler()
+cw_handler = watchtower.CloudWatchLogHandler(log_group='cruddur')
+LOGGER.addHandler(console_handler)
+LOGGER.addHandler(cw_handler)
+LOGGER.info("some message")
+
+@app.after_request
+def after_request(response):
+    timestamp = strftime('[%Y-%b-%d %H:%M]')
+    LOGGER.error('%s %s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path, response.status)
+    return response
+    
+```
+The following was logged from one of the API endpoints
+```
+LOGGER.info('Hello Cloudwatch!')
+
+```
+Also ensure the AWS env vars have been added to docker-compose. i.e
+```
+      AWS_DEFAULT_REGION: "${AWS_DEFAULT_REGION}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      
+```
+
 
 
 
