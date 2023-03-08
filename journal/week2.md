@@ -7,6 +7,14 @@ In the course of the week I looked into observability, monitoring and distribute
  - Rollbar account
  - Github Codespaces. I had to switch from Gitpod after running out of credits.
 
+## Observability and monitoring
+ - Decreased alert fatigue for Security Operation teams
+ - Visibility of end2end of Logs, metrics and tracing
+ - Troubleshoot and resolve things quickly
+ - Understand application health
+ - Accelerate collaboration between teams.
+ - Reduce overall operation cost
+
 ### Honeycomb
 This was used in conjunction with opentelemetry. OpenTelemetry is an open-source project that provides a set of tools, APIs, and SDKs for distributed tracing, metrics collection, and logging in modern applications.
 
