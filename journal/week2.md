@@ -8,6 +8,13 @@ In the course of the week I looked into observability, monitoring and distribute
  - Github Codespaces. I had to switch from Gitpod after running out of credits.
 
 ## Observability and monitoring
+Software observability is the practice of monitoring, measuring, and understanding the behavior and performance of software systems.
+
+###### Pillars of Observability
+ - Metrics
+ - Traces
+ - Logs
+Why Observability?
  - Decreased alert fatigue for Security Operation teams
  - Visibility of end2end of Logs, metrics and tracing
  - Troubleshoot and resolve things quickly
