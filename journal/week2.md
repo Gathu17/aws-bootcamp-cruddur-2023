@@ -8,12 +8,13 @@ In the course of the week I looked into observability, monitoring and distribute
  - Github Codespaces. I had to switch from Gitpod after running out of credits.
 
 ## Observability and monitoring
-Software observability is the practice of monitoring, measuring, and understanding the behavior and performance of software systems.
+Software observability is the practice of monitoring, measuring, and understanding the behavior and performance of software systems. Software monitoring is the practice of tracking and measuring the performance and behavior of software systems over time.
 
 ###### Pillars of Observability
  - Metrics
  - Traces
  - Logs
+ 
 Why Observability?
  - Decreased alert fatigue for Security Operation teams
  - Visibility of end2end of Logs, metrics and tracing
@@ -21,6 +22,12 @@ Why Observability?
  - Understand application health
  - Accelerate collaboration between teams.
  - Reduce overall operation cost
+##### Central Observability Platform
+ - AWS Security hub  with Amazon EventBridge
+ - SIEM (Security Incident and Event Management)
+ - Open Source Dashboards
+ - Event Driven Architecture with AWS services
+
 
 ### Honeycomb
 This was used in conjunction with opentelemetry. OpenTelemetry is an open-source project that provides a set of tools, APIs, and SDKs for distributed tracing, metrics collection, and logging in modern applications.
