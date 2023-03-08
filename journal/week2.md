@@ -168,6 +168,63 @@ Also ensure the AWS env vars have been added to docker-compose. i.e
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
       
 ```
+The logs were observed in the AWS console
+![Screenshot (2138)](https://user-images.githubusercontent.com/92152669/223592618-d0159fb7-19c9-4fdd-a84f-4b2ede9549aa.png)
+
+## Rollbar
+To install, add the following dependencies to requirements.txt
+```
+blinker
+rollbar
+
+```
+I exported the rollbar access token and added to github secrets as I was using Gitthub Codespace
+```
+export ROLLBAR_ACCESS_TOKEN=""
+
+```
+The variable was also added to docker-compose
+```
+ROLLBAR_ACCESS_TOKEN: "${ROLLBAR_ACCESS_TOKEN}"
+```
+
+In ```app.py``` the following was added
+```
+import rollbar
+import rollbar.contrib.flask
+from flask import got_request_exception
+
+```
+```
+rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
+@app.before_first_request
+def init_rollbar():
+    """init rollbar module"""
+    rollbar.init(
+        # access token
+        rollbar_access_token,
+        # environment name
+        'production',
+        # server root directory, makes tracebacks prettier
+        root=os.path.dirname(os.path.realpath(__file__)),
+        # flask already sets up logging
+        allow_logging_basic_config=False)
+
+    # send exceptions from `app` to rollbar, using flask's signal system.
+    got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
+    
+```
+```
+@app.route('/rollbar/test')
+def rollbar_test():
+    rollbar.report_message('Hello World!', 'warning')
+    return "Hello World!"
+    
+```
+The following was observed in Rollbar
+![Screenshot (2139)](https://user-images.githubusercontent.com/92152669/223596301-575f2138-a7cc-45fa-9204-88c769fb0337.png)
+![Screenshot (2140)](https://user-images.githubusercontent.com/92152669/223597670-9b7799d4-0b73-4f30-a385-b47027e3802a.png)
+
 
 
 
