@@ -18,16 +18,14 @@ I configured a User pool named Cruddur-User-pool as shown below:
 ![Screenshot (2147)](https://user-images.githubusercontent.com/92152669/225578283-58ec056e-3019-4a6f-9348-867b6b97a5a6.png)
 
 
-# Configuration Amplify
+# Configurng Cognito in frontend
 
- Using the terminal go to the dictory by typing the following command:
+Installing AWS-amplify
 ``` 
-cd front-react-js 
 npm i aws-amplyfy --save
 ```
-this command will install amplify library and  will be added to the package.json
 
-from the **app.js**, add the following codes:
+The following code is added to ```app.js```.
 ```
 import { Amplify } from 'aws-amplify';
 
@@ -48,16 +46,13 @@ Amplify.configure({
 });
 ```
 
-from the **docker-compose.yml** on the frontend-react-js under environment:, add the following code
+from the **docker-compose.yml** under frontedn service add the following code
 ```
 REACT_APP_AWS_PROJECT_REGION: "${AWS_DEFAULT_REGION}"
 REACT_APP_AWS_COGNITO_REGION: "${AWS_DEFAULT_REGION}"
 REACT_APP_AWS_USER_POOLS_ID: "${AWS_USER_POOLS_ID}"
 REACT_APP_CLIENT_ID: "${APP_CLIENT_ID}"
 ```
-Make sure to create the env var  **AWS_USER_POOLS_ID** and **APP_CLIENT_ID** on gitpod and codespace. (N.B: Since these env vars have not been loaded during the booting, you might get an error. either you rebuild your workspace or you pass the variable via the terminal. I do not hardcode the env vars for security reasons and for simplicity)
-The AWS_USER_POOLS_ID and APP_CLIENT_ID you find when you configure the cognito user pool.
-
 
 # Showing the components based on logged in/logged out
 
@@ -65,25 +60,7 @@ from the **homefeedpage.js** insert the following command
 ```
 import { Auth } from 'aws-amplify';
 ```
-
-this instruction is already implemented so you can skip this part
-```
-const [user, setUser] = React.useState(null);
-```
-
-delete the code with the  cookies 
-```
-  const checkAuth = async () => {
-    console.log('checkAuth')
-    // [TODO] Authenication
-    if (Cookies.get('user.logged_in')) {
-        display_name: Cookies.get('user.name'),
-        handle: Cookies.get('user.username')
-    }
-  };
-```
-
-and replace with the following that used cognito
+The checkAuth function was replaced with the following
 ```
 // check if we are authenicated
 const checkAuth = async () => {
@@ -107,43 +84,13 @@ const checkAuth = async () => {
 
 ```
 
-this instruction is already implemented so you can skip this part
-```
-// check when the page loads if we are authenicated
-React.useEffect(()=>{
-  loadData();
-  checkAuth();
-}, [])
-```
 
-This instruction is already implemented so you can skip this part as well.
-```
-<DesktopNavigation user={user} active={'home'} setPopped={setPopped} />
-<DesktopSidebar user={user} />
-```
-On profileinfo.js, delete the following code
-```
-import Cookies from 'js-cookie'
-```
-and replace with the following
+On profileinfo.js, add the following code
+
 ```
 import { Auth } from 'aws-amplify';
 ```
 
-remove the following code
-```
-    console.log('signOut')
-    // [TODO] Authenication
-    Cookies.remove('user.logged_in')
-    //Cookies.remove('user.name')
-    //Cookies.remove('user.username')
-    //Cookies.remove('user.email')
-    //Cookies.remove('user.password')
-    //Cookies.remove('user.confirmation_code')
-    window.location.href = "/"
-```
-
-and we replace with the new signout
 ```
 const signOut = async () => {
     try {
@@ -154,34 +101,11 @@ const signOut = async () => {
 }
 ```
 
-# Implementation of the sign in page
 From the **signinpage.js** remove the following code
-```
-import Cookies from 'js-cookie'
 
-```
-
-and replace with the following
 ```
 import { Auth } from 'aws-amplify';
 ```
-
-remove the following code 
-```
-  const onsubmit = async (event) => {
-    event.preventDefault();
-    setErrors('')
-    console.log('onsubmit')
-    if (Cookies.get('user.email') === email && Cookies.get('user.password') === password){
-      Cookies.set('user.logged_in', true)
-      window.location.href = "/"
-    } else {
-      setErrors("Email and password is incorrect or account doesn't exist")
-    }
-    return false
-  }
-```
-and replace it with the new one
 ```
 const onsubmit = async (event) => {
     setErrors('')
@@ -202,41 +126,11 @@ const onsubmit = async (event) => {
   }
 ```
 
-To try, just launch the container up on **"docker-compose.yml"**  and see if the login page works. to troubleshoot open "developer tools" or use inspect (browser) if you receive "NotAuthorizedException: Incorrect user or password".This means everything is set properly. if you got an error "auth not defined", the problem is the cognito user pool configuration. need to recreate.
-
-Create a user on the cognito user pool and force change the password using the command on troubleshooting (there is no way to change on password via console). the password to login will be Testing1234! (as the commandline shows)
-
-# Implement the signup page
-Since you have managed to access using the credential created via console, it is time to delete it cos it is no anymore needed.
-
-From the **signuppage.js** remove the following code
-```
-import Cookies from 'js-cookie'
-
-```
-
-and replace with the following
+From the **signuppage.js** add the following code
 ```
 import { Auth } from 'aws-amplify';
 ```
 
-delete the following command
-```
-  const onsubmit = async (event) => {
-    event.preventDefault();
-    console.log('SignupPage.onsubmit')
-    // [TODO] Authenication
-    Cookies.set('user.name', name)
-    Cookies.set('user.username', username)
-    Cookies.set('user.email', email)
-    Cookies.set('user.password', password)
-    Cookies.set('user.confirmation_code',1234)
-    window.location.href = `/confirm?email=${email}`
-    return false
-  }
-```
-
-and add the new code
 ```
 const onsubmit = async (event) => {
     event.preventDefault();
@@ -263,28 +157,11 @@ const onsubmit = async (event) => {
     return false
   }
 ```
+In the confirmationpage.js, add the following code
 
-# Implementation of the confirmation page
-from the confirmationpage.js, remove the following code
-
- ```
-import Cookies from 'js-cookie'
-
-```
-
-and replace with the following
 ```
 import { Auth } from 'aws-amplify';
 ```
-
-and remove the following code
-```
-  const resend_code = async (event) => {
-    console.log('resend_code')
-    // [TODO] Authenication
-  }
-```
-and replace with the following
 ``` 
 const resend_code = async (event) => {
  
@@ -308,31 +185,6 @@ const resend_code = async (event) => {
 
 ```
 
-and remove the following code
-```
- const onsubmit = async (event) => {
-    event.preventDefault();
-    console.log('ConfirmationPage.onsubmit')
-    // [TODO] Authenication
-    if (Cookies.get('user.email') === undefined || Cookies.get('user.email') === '' || Cookies.get('user.email') === null){
-      setErrors("You need to provide an email in order to send Resend Activiation Code")   
-    } else {
-      if (Cookies.get('user.email') === email){
-        if (Cookies.get('user.confirmation_code') === code){
-          Cookies.set('user.logged_in',true)
-          window.location.href = "/"
-        } else {
-          setErrors("Code is not valid")
-        }
-      } else {
-        setErrors("Email is invalid or cannot be found.")   
-      }
-    }
-    return false
-  }
-```
-
-and replace with the cognito code
 ```
 const onsubmit = async (event) => {
   event.preventDefault();
@@ -346,24 +198,12 @@ const onsubmit = async (event) => {
   return false
 }
 ```
-
-# Implementation of the recovery page
-from the recoverpage.js, add the following code
+In the recoverpage.js, add the following code
 
  ```
 import { Auth } from 'aws-amplify';
 ```
 
-remove the following code
-```
-  const onsubmit_send_code = async (event) => {
-    event.preventDefault();
-    console.log('onsubmit_send_code')
-    return false
-  }
-```
-
-and add the these lines
 ```
 const onsubmit_send_code = async (event) => {
     event.preventDefault();
@@ -374,17 +214,6 @@ const onsubmit_send_code = async (event) => {
     return false
   }
 ```
-
-remove the following code
-```
-  const onsubmit_confirm_code = async (event) => {
-    event.preventDefault();
-    console.log('onsubmit_confirm_code')
-    return false
-  }
-```
-
-with the following new code
 ```
 const onsubmit_confirm_code = async (event) => {
   event.preventDefault();
