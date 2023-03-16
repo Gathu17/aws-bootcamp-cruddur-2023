@@ -230,3 +230,23 @@ const onsubmit_confirm_code = async (event) => {
 
 
 ```
+## Configuring Cognito in the Backend
+Add in the `HomeFeedPage.js` a header to pass along the access token
+
+```js
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("access_token")}`
+  }
+
+The CORS configuration was also modified in **app.py**.
+cors = CORS(
+  app, 
+  resources={r"/api/*": {"origins": origins}},
+  headers=['Content-Type', 'Authorization'], 
+  expose_headers='Authorization',
+  methods="OPTIONS,GET,HEAD,POST"
+)
+The Flask AWS Cognito module was added in the lib folder as seen [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/lib/cognito_jwt_token.py)
+
+Using the access token , the JWT claims was obtained in ```api/activities/home``` endpoint as seen below.
+![Screenshot (2148)](https://user-images.githubusercontent.com/92152669/225775849-20eccbab-8930-4748-b26c-b5d28abf229d.png)
