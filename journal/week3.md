@@ -10,32 +10,13 @@ Common types of authentication include:
 Decentralized authentication is a type of authentication where the process of verifying a user's identity is not managed by a centralized authority or organization. Instead, it is performed by a network of nodes, each of which can validate the user's identity independently.
  
  Amazon Cognito is an aws service that allows users to authenticate. The users are stored n your aws account.
+ Types of Amazon Cognito include:
+  - Cognito User Pool
+  - Cognito Identity Pool
 
- **Amazon Cognito User Pool**
+I configured a User pool named Cruddur-User-pool as shown below:
+![Screenshot (2147)](https://user-images.githubusercontent.com/92152669/225578283-58ec056e-3019-4a6f-9348-867b6b97a5a6.png)
 
-
- ![Amazon Cognito User Pool](https://td-mainsite-cdn.tutorialsdojo.com/wp-content/uploads/2020/05/Cognito-User-Pool-for-Authentication.png)
-
- **Cognito Identity Pool**
-
-
-  ![Cognito Identity Pool](https://td-mainsite-cdn.tutorialsdojo.com/wp-content/uploads/2020/05/Cognito-Identity-Pools-Federated-Identities.png)
-
-Reason for using Amazon Cognito
-- User directory for Customer
-- Ability to access aws resources for the application being built
-- Identity broker for AWS Resources with temporary credentials
-- It can extend users to AWS Resources easily.
-
-# Cost
-This Week Cirag did not post any video about cost so I did some research this is what I found:
-> The Cognito Your User Pool feature has a free tier of 50,000 MAUs ( monthly active users) per account for users who sign in directly to Cognito User Pools and 50 MAUs for users federated through SAML 2.0 based identity providers. The free tier does not automatically expire at the end of your 12 month AWS Free Tier term, and it is available to both existing and new AWS customers indefinitely. Please note - the free tier pricing isn’t available for both Your User Pool feature and SAML or OIDC federation in the AWS GovCloud regions.
-
-For reference click [Here](https://aws.amazon.com/cognito/pricing/).
-
-# Setup Cognito User Pool
-
-Please  click [here](https://scribehow.com/shared/How_to_Create_a_User_Pool_in_AWS_Cognito__KfU7GrqHS2ex3SW-xNLcSw) to create the user pool using the console
 
 # Configuration Amplify
 
