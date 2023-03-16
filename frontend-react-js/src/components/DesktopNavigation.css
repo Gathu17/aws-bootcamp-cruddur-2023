@@ -7,7 +7,7 @@ nav {
 nav .logo {
   width: 48px;
   height: 48px;
-  fill: rgb(149,0,255);
+  fill: rgb rgb(69, 9, 112);
 }
 
 nav a.primary {
@@ -34,16 +34,16 @@ nav a.primary:hover .icon {
 }
 
 nav a.primary.active {
-  color: rgb(149,0,255) !important;
+  color:  rgb(82, 21, 126) !important;
   font-weight: 600;
 }
 nav a.primary.active svg {
-  fill: rgb(149,0,255) !important;
+  fill: rgb rgb(82, 21, 126) !important;
 }
 
 nav button.post {
   display: block;
-  background: rgba(149,0,255,1);
+  background:  rgb(82, 21, 126);
   color: #fff;
   border: none;
   text-decoration: none;
@@ -54,4 +54,7 @@ nav button.post {
   font-weight: 600;
   text-align: center;
   margin-top: 24px;
+}
+nav button.post:hover{
+  background-color: rgb(149, 73, 204);
 }
