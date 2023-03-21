@@ -7,7 +7,12 @@
 	// connected. This is typically a file mount in .devcontainer/docker-compose.yml
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"features": {
-		"ghcr.io/devcontainers/features/aws-cli:1": {}
+		"ghcr.io/devcontainers/features/aws-cli:1": {},
+		"command": {
+			"name": "Update sg rule",
+			"runArgs": ["sh", "/workspaces/${localWorkspaceFolderBasename}/backend-flask/bin/update-sg-rule"],
+			"command": "SG-rule"
+		}
 	},
 	"remoteEnv": {
 		"AWS_CLI_AUTO_PROMPT": "on-partial"
