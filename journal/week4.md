@@ -38,16 +38,9 @@ aws rds create-db-instance \
   --performance-insights-retention-period 7 \
   --no-deletion-protection
 ```
-Note:
-- For the availability zone check the console so the everything match according on where you are working
--
+The following json was logged in the console 
+![Screenshot (2178)](https://user-images.githubusercontent.com/92152669/227918477-d423a3e1-92af-4838-bdc9-a7ee4cbcd705.png)
 
-Once the rds is running, make sure to put it in stop so you dont incure with extra cost. Note that this is valid only for 7 days so it is not permanent.
-
-from the terminal type the following code
-```
-psql -Upostgres --host localhost
-```
 
 **Common Psql commands**
 ```
@@ -69,128 +62,13 @@ UPDATE table_name SET column1 = value1, column2 = value2, ... WHERE condition; -
 DELETE FROM table_name WHERE condition; -- Delete data from a table
 ```
 
-# create local database 
+### Creating Database and tables
+Once the connection url to the postgreSQL was setup. The following line was used to create Database for Cruddur in psql.
 
-Type the following command to create the database within the PSQL client
 ```
 CREATE database cruddur;
 ```
 
-from backend flask, create a folder called db and inside a file called schema.sql
-
-and insert the following sql command on the schema.sql created before
-```
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-```
-exit from the psql command by typing the following command
-```
-\q
-```
-and type the following command
-```
-psql cruddur < backend-flask/db/schema.sql -h localhost -U postgres
-```
-and type the password and type the following command to create the env var
-```
-export CONNECTION_URL="postgresql://postgres:password@localhost:5432/cruddur"
-gp env CONNECTION_URL="postgresql://postgres:password@localhost:5432/cruddur"
-```
-do the same steps for the rds (not necessary at this point unless you start connecting with the rds)
-
-from backend-flask create a folder call bin and inside create 3 files called"db-create" "db-drop" and "db-schema-load" and inside for each file created, insert the following command
-```
-#! /usr/bin/bash
-```
-
-to change the executable of the file created before, type the following code:
-```
-chmod u+x bin/db-create
-chmod u+x bin/db-drop
-chmod u+x bin/db-schema-load
-```
-
-from the file db-drop add the following code
-```
-echo "db-drop"
-NO_DB_CONNECTION_URL=$(sed 's/\/cruddur//g' <<<"$CONNECTION_URL")
-```
-For more information about sed visit the following [link](https://www.geeksforgeeks.org/sed-command-in-linux-unix-with-examples/)
-
-from the file db-create add the following command
-```
-echo "db-create"
-NO_DB_CONNECTION_URL=$(sed 's/\/cruddur//g' <<<"$CONNECTION_URL")
-psql $NO_DB_CONNECTION_URL -c "create database cruddur;"
-
-```
-
-from the file db-schema-load add the following command
-```
-#echo "== db-schema-load"
-CYAN='\033[1;36m'
-NO_COLOR='\033[0m'
-LABEL="db-schema-load"
-printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
-
-schema_path="$(realpath .)/db/schema.sql"
-
-echo $schema_path
-
-if [ "$1" = "prod" ]; then
-  echo "Running in production mode"
-  URL=$PROD_CONNECTION_URL
-else
-  URL=$CONNECTION_URL
-fi
-
-psql $URL cruddur < $schema_path
-```
-
-for the coloring the echo refer to the following [link](https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux)
-
- on schema.sql insert the code to create the table users and table activities
- ```
-
-DROP TABLE IF EXISTS public.users;
-DROP TABLE IF EXISTS public.activities;
-
-CREATE TABLE public.users (
-  uuid UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  display_name text,
-  handle text,
-  cognito_user_id text,
-  created_at TIMESTAMP default current_timestamp NOT NULL
-);
-
-CREATE TABLE public.activities (
-  uuid UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  user_uuid UUID not null,
-  message text NOT NULL,
-  replies_count integer DEFAULT 0,
-  reposts_count integer DEFAULT 0,
-  likes_count integer DEFAULT 0,
-  reply_to_activity_uuid integer,
-  expires_at TIMESTAMP,
-  created_at TIMESTAMP default current_timestamp NOT NULL
-);
- ```
-
- create a script inside the folder bin called **db-connect** 
- ```
-#! /usr/bin/bash
-
-psql $CONNECTION_URL
- ```
-
-and change the permission of the file
- ```
-chmod u+x bin/db-connection
- ```
-
- create a file on db called seed.sql and create inside bin a file called db-seed with following code
- ```
-#! /usr/bin/bash
-#echo "== db-seed-load"
 CYAN='\033[1;36m'
 NO_COLOR='\033[0m'
 LABEL="db-seed-load"
