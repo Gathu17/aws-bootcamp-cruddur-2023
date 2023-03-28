@@ -79,79 +79,29 @@ I also created the bash script to modify the RDS security group with the followi
 ```
 aws ec2 modify-security-group-rules \
     --group-id $DB_SG_ID \
-    --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={Description=GITPOD,IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$(curl ifconfig.me)/32}"
+    --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE,SecurityGroupRule={Description=GITPOD,IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$(curl ifconfig.me)/32}"
 ```
+![Screenshot (2179)](https://user-images.githubusercontent.com/92152669/228193072-c91a6fb5-b609-41f8-9768-6dd1ae5853a6.png)
 
-The command to run the script was added to the devcontainer.json that is initiated when starting the codespace
-# Create Lambda
-Create a lambda in the region where are your services and create the same file under aws/lambdas calling the file cruddur-post-confirmation.py
+Remember to set the DB_SG_RULE and DB_SG_ID vars in the codespace.
+The command to run the script was added to the devcontainer.json that is initiated when starting the codespace.
 
-```
-import json
-import psycopg2
+# Create Lambda function
+In the AWS Lambda, a function was created with the code present [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/aws/lambdas/cruddur-post-confirmation.py)
+When creating lambda function . I ran into an issue on permissions to create function. This can be solved by going to policies and adding a policy for **AWSLambdaBasicExecution**. This policy was used in a created rle for the lambda function. You will also need to add policy for **AWSLambdaVPCExecution**
 
-def lambda_handler(event, context):
-    user = event['request']['userAttributes']
-    print('userAttributes')
-    print(user)
-    user_display_name = user['name']
-    user_email        = user['email']
-    user_handle       = user['preferred_username']
-    user_cognito_id   = user['sub']
-    try:
-        conn = psycopg2.connect(os.getenv('CONNECTION_URL'))
-        cur = conn.cursor()
-        sql = f"""
-            "INSERT INTO users (
-                display_name,
-                email,
-                handle,
-                cognito_user_id
-            ) 
-            VALUES(
-                {user_display_name},
-                {user_email},
-                {user_handle},
-                {user_cognito_id}
-            )"
-        """            
-        cur.execute(sql)
-        conn.commit() 
 
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            cur.close()
-            conn.close()
-            print('Database connection closed.')
+the env var for the lambda will be **CONNECTION_URL** which has the variable of the **PROD_CONNECTION_URL** set in our codespace earlier.
 
-    return event
-```
+You will also need to create a layer for psycopg2 used in our lambda function. The zip file created can be found [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/tree/main/aws/aws-psycopg2)
+The VPC was also added for our security group.
 
-the env var for the lambda will be **CONNECTION_URL** which has the variable of the **PROD_CONNECTION_URL** set on gitpod/codespace (example: PROD_CONNECTION_URL="postgresql://userofthedb:masterpassword@endpointofthedb:5432/cruddur)
+Once the Lambda function was setup correctly, cloudwatch logs should display the following when user signs up. PS: Confirm from the cognito user pool that the user isn't already added 
+![Screenshot (2180)](https://user-images.githubusercontent.com/92152669/228197927-9edf8e05-cada-4ca2-88bf-a7877155d977.png)
 
-Once you create the env var, create also the layer>add layers> select specify arn
-```
-arn:aws:lambda:your region:898466741470:layer:psycopg2-py38:1
-```
+To confirm the user has been added, you will connect to the database using ```./bin/connect prod ``` that connects to our production database. By running  ```SELECT * FROM users```, the user should be seen in the user table as shown.
+![Screenshot (2181)](https://user-images.githubusercontent.com/92152669/228200485-2a92e90c-bec0-484d-97c1-c4e4bfe2020f.png)
 
-now it is time to create the trigger for cognito.
-from cognito,  select the user pool and go to the user pool properties to find the lambda triggers. follow the configuration according to the image below:
 
-![lambda triggers](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/images/lambda%20triggers.png)
 
-Make sure to attach the following policy **AWSLambdaVPCAccessExecutionRole** to the lambda role by going to configuration>permission> link under the Role name.
 
-Once attached the policy, go to VPC and select the VPC where resides the RDS,
-the subnet mask (i suggest selecting just 1 as you could have timeout error during the execution of the lambda) and select the same security group of the rds. In my case i took the default vpc for my region as i deployed there, the subnetmask in my case eu-west-2a (make sure to verify where reside your rds by going to EC2>Network Interface under network & security)
-and security group please make sure to insert the new inbound rule
-
-![Security Group](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/images/newSG.png)
-
-#Troubleshooting
-
-This command see if the connection is estabilished
-```
-echo $CONNECTION_URL
-```
