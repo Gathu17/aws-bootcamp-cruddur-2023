@@ -71,124 +71,18 @@ CREATE database cruddur;
 
 I created bash scripts for creating and dropping databases, connecting to databases and creating users and activities as can be evidenced [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/tree/main/backend-flask/bin)
 
-## Install driver for psql
-
-Add the following libraries into the requirements.txt of the backend flask
+Note: Be sure to add permissions using the following command
 ```
-psycopg[binary]
-psycopg[pool]
+chmod +x ./bin/<script>
 ```
-
-and run the for this time the following command:
-```
-pip install -r requirements.txt
-```
-
-create a file under lib called **db.py**. this will be the connection for your backend
-```
-from psycopg_pool import ConnectionPool
-import os
-
-def query_wrap_object(template):
-  sql = f"""
-  (SELECT COALESCE(row_to_json(object_row),'{{}}'::json) FROM (
-  {template}
-  ) object_row);
-  """
-  return sql
-
-def query_wrap_array(template):
-  sql = f"""
-  (SELECT COALESCE(array_to_json(array_agg(row_to_json(array_row))),'[]'::json) FROM (
-  {template}
-  ) array_row);
-  """
-  return sql
-
-connection_url = os.getenv("CONNECTION_URL")
-pool = ConnectionPool(connection_url)
-```
-
-and insert the library on **home_activities**
-```
-from lib.db import pool,query_wrap_array
-```
-
-and add the following code
-```
-sql = """
-      SELECT
-        activities.uuid,
-        users.display_name,
-        users.handle,
-        activities.message,
-        activities.replies_count,
-        activities.reposts_count,
-        activities.likes_count,
-        activities.reply_to_activity_uuid,
-        activities.expires_at,
-        activities.created_at
-      FROM public.activities
-      LEFT JOIN public.users ON users.uuid = activities.user_uuid
-      ORDER BY activities.created_at DESC
-      """
-      print(sql)
-      span.set_attribute("app.result_length", len(results))
-      with pool.connection() as conn:
-        with conn.cursor() as cur:
-          cur.execute(sql)
-          # this will return a tuple
-          # the first field being the data
-          json = cur.fetchall()
-      return json[0]
-```
-
-from the file docker-compose change the **CONNECTIONS_URL** with the following
-```
-      CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"
-```
-
-From the console active the RDS if it is in pause mode
-
-create the PROD_CONNECTION_URL that will point to the RDS
-```
-postgresql://userofthedb:masterpassword@endpointofthedb:5432/cruddur
-```
-create the local env and on gitpod/codespace
-```
-export PROD_CONNECTION_URL="postgresql://userofthedb:masterpassword@endpointofthedb:5432/cruddur"
-gp env PROD_CONNECTION_URL="postgresql://userofthedb:masterpassword@endpointofthedb:5432/cruddur"
-```
-**Note**: the password should not ending with ! as the url will be !@ and it could cause some error during the launching the command. if you experience an error "bash bla bla cruddur" you need to change the password for the DB of rds 
-
-In order to connect to the RDS instance we need to provide our Gitpod IP and whitelist for inbound traffic on port 5432.
-```
-export GITPOD_IP=$(curl ifconfig.me)
-```
-
-create the env var for the security group and the security group rule
-```
-export DB_SG_ID="sg-sdfsdf"
-gp env DB_SG_ID="sg-sdfsdf"
-export DB_SG_RULE_ID="sgr-sdfsdfsdf"
-gp env DB_SG_RULE_ID="sgr-sdfsdfsdf"
-```
-
-Since the ip address changes everytime, you need to change the ip on the security group of the rds instance
-here is the script to add to the file **rds-update-sg-rule** under bin
+I also created the bash script to modify the RDS security group with the following aws command
 ```
 aws ec2 modify-security-group-rules \
     --group-id $DB_SG_ID \
-    --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={Description=GITPOD,IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$GITPOD_IP/32}"
+    --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={Description=GITPOD,IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$(curl ifconfig.me)/32}"
 ```
 
-on the file *gitpod.yml** add this line so it will get the ip of the instance
-```
-    before: |
-      export GITPOD_IP=$(curl ifconfig.me)
-      source  "$THEIA_WORKSPACE_ROOT/backend-flask/bin/rds-update-sg-rule"
-```
-
+The command to run the script was added to the devcontainer.json that is initiated when starting the codespace
 # Create Lambda
 Create a lambda in the region where are your services and create the same file under aws/lambdas calling the file cruddur-post-confirmation.py
 
