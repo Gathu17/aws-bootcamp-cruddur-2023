@@ -102,6 +102,14 @@ Once the Lambda function was setup correctly, cloudwatch logs should display the
 To confirm the user has been added, you will connect to the database using ```./bin/connect prod ``` that connects to our production database. By running  ```SELECT * FROM users```, the user should be seen in the user table as shown.
 ![Screenshot (2181)](https://user-images.githubusercontent.com/92152669/228200485-2a92e90c-bec0-484d-97c1-c4e4bfe2020f.png)
 
+### Create activity.
+The next step was to add activities to our ```public.activities``` table.
+In the create_activity.py file, the functions to create activity and query object was modifed. The db.py was also refractored as shown [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/lib/db.py)
+
+Once an activity is created in our cruddur app, it should display in our database as shown below
+![Screenshot (2182)](https://user-images.githubusercontent.com/92152669/228203887-7a11ab05-321d-481e-8f7d-203397e4ac2c.png)
+
+
 
 
 
