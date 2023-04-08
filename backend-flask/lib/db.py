@@ -50,7 +50,7 @@ class Db:
         return json[0]
    # when we want to commit data such as an insert
   def query_commit(self,sql,params={}):
-    self.print_sql('commit with returning',sql)
+    self.print_sql('commit with returning',sql,params)
 
     pattern = r"\bRETURNING\b"
     is_returning_id = re.search(pattern, sql)

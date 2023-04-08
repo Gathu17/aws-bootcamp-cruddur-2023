@@ -1,5 +1,5 @@
 #! /usr/bin/bash
--e # stop if it fails at any point
+set -e # stop if it fails at any point
 
 CYAN='\033[1;36m'
 NO_COLOR='\033[0m'
@@ -12,3 +12,4 @@ source "$bin_path/db/db-drop"
 source "$bin_path/db/db-create"
 source "$bin_path/db/db-schema-load"
 source "$bin_path/db/db-seed"
+source "$bin_path/db/update_cognito_user_ids"
