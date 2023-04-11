@@ -45,6 +45,40 @@ The script that populated cognito_user_id column in the table is seen [here](htt
 
 The following file was added [backend-flask/lib/ddb.py](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/lib/ddb.py). 
 Make sure to add **AWS_ENDPOINT_URL: "http://dynamodb-local:8000"** inside the **docker-compose.yml**.
+The ``` Ddb.py ``` contains class Ddb with methods to 
+ - list message grups
+ - list messages
+ - create message
+ - create message group
+ 
+The slass is used in our backend service for message groups [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/message_groups.py)
+Here my_user_uuid is used to fetch the message group linked to that users uuid. The SQL script to fetch users.uuid using the cognito_user_id was added as shown
+[here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/sql/users/uuid_from_cognito_user_id.sql)
+
+Make sure to also add the message groups api in ```app.py```.
+```
+@app.route("/api/message_groups", methods=['GET'])
+def data_message_groups():
+  access_token = extract_access_token(request.headers)
+  try:
+    claims = cognito_jwt_token.verify(access_token)
+    # authenicatied request
+    app.logger.debug("authenicated")
+    app.logger.debug(claims)
+    cognito_user_id = claims['sub']
+    model = MessageGroups.run(cognito_user_id=cognito_user_id)
+    if model['errors'] is not None:
+      return model['errors'], 422
+    else:
+      return model['data'], 200
+  except TokenVerifyError as e:
+    # unauthenicatied request
+    app.logger.debug(e)
+    return {}, 401
+   
+```
+#### Frontend implementation
+Created module in the util folder that checks if users is authenticated. 
 
 
 
