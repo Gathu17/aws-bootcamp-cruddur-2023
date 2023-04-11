@@ -14,23 +14,18 @@ In Amazon DynamoDB, a partition key and sort key together form a composite prima
 
 Created different folders for postgreSQL scripts and DynamoDB scripts.
 
-For each postgres script, the folder will be the following:
-```
-backend-flask/bin/db-connect → backend-flask/bin/db/connect
-backend-flask/bin/db-create → backend-flask/bin/db/create
-backend-flask/bin/db-drop → backend-flask/bin/db/drop
-backend-flask/bin/db-schema-load → backend-flask/bin/db/schema-load
-backend-flask/bin/db-seed → backend-flask/bin/db/seed
-backend-flask/bin/db-sessions → backend-flask/bin/db/sessions
-backend-flask/bin/db-setup → backend-flask/bin/db/setup
+Added boto3 library to requirements.txt file.
 
-```
+The utility scripts were created that would:
+ - load schema for our tables in dynamoDB 
+ - dropping cruddur messages table
+ - scanning the table
+ - seeding data to our table
+ - list tables in DynamoDB
 
-Note: Inside the file **backend-flask/bin/db/setup** we added the following code 
 
-```
-python "$bin_path/db/update_cognito_user_ids"
-```
+
+
 The file ([**update_cognito_user_ids**](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db/update_cognito_user_ids)) must be created. The script adds the cognito user id.
 
 Make sure to add **boto3** into **backend-flask/requirements.txt**, which is the AWS SDK for Python to create, configure, and manage AWS services such as DynamoDB.
