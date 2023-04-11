@@ -1,9 +1,18 @@
 # Week 5 — DynamoDB and Serverless Caching
 
+# BynamoDB modelling
 
-# Restructure Script Folders
+The following chart describes the model for our cruddur app
+![Screenshot (2201)](https://user-images.githubusercontent.com/92152669/231102379-9e4a01dd-56a4-45c9-ac89-a14db0718e87.png)
 
-As we are going to create more scripts, we implement the following folders structure following:
+The message group contains  conversation between different users. 
+We have our message_group_uuid as the partition key and created_at as the sort key.
+In Amazon DynamoDB, a partition key and sort key together form a composite primary key for a table. When users creates new item , DynamoDB uses partition key to identify which partition to put the item. The sort key is used to sort items within the partition.
+
+
+# Reorganized Bash scripts
+
+Created different folders for postgreSQL scripts and DynamoDB scripts.
 
 For each postgres script, the folder will be the following:
 ```
