@@ -34,22 +34,19 @@ The scripts can be found [here](https://github.com/Gathu17/aws-bootcamp-cruddur-
 
 To populate the cognito_user_uuid that is present in our seed database as mock as seen [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/seed.sql), a script to list cognito users was added.[script](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/cognito/list-users)
 
-The script the cognito_user_id column in the table as seen [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db/update_cognito_user_ids) was ran. 
+The script that populated cognito_user_id column in the table is seen [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db/update_cognito_user_ids) was ran. 
 ![Screenshot (2207)](https://user-images.githubusercontent.com/92152669/231137274-377d76ce-636c-4ea4-b7b8-e81c8ed50362.png)
 
-
-Create [backend-flask/bin/cognito/list-users](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/cognito/list-users)). to list users data saved in AWS Cognito
-
-On **docker-compose.yml** insert if not exist the following **CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"** and comment #CONNECTION_URL: "${PROD_CONNECTION_URL}". This week we wont use RDS.
+**NB** The CONNECTION_URL in docker-compose should point to postgres database being used.
 
 
 
-## Implementation of Messages with the local DynamoDB
+## Creating messages and message groups in DynamoDB
 
-Create the following file [**backend-flask/lib/ddb.py](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/lib/ddb.py). 
-Make sure to create **AWS_ENDPOINT_URL: "http://dynamodb-local:8000"** inside the **docker-compose.yml**.
+The following file was added [backend-flask/lib/ddb.py](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/lib/ddb.py). 
+Make sure to add **AWS_ENDPOINT_URL: "http://dynamodb-local:8000"** inside the **docker-compose.yml**.
 
-For additional changes from the backend see the [repo](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/commits/main/backend-flask)  and frontent [repo](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/commits/main/frontend-react-js)
+
 
 To retrieve messages and message groups from Dynamodb instead of using hard-coded data, modify the backend routes and functions. Rather than passing in a handle, use message_group_uuid. The Ddb class's list_message_groups and list_messages are mainly used for these implementations.
 
