@@ -1,6 +1,6 @@
 # Week 5 — DynamoDB and Serverless Caching
 
-# BynamoDB modelling
+# DynamoDB modelling
 
 The following chart describes the model for our cruddur app
 ![Screenshot (2201)](https://user-images.githubusercontent.com/92152669/231102379-9e4a01dd-56a4-45c9-ac89-a14db0718e87.png)
