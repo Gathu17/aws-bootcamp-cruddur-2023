@@ -14,19 +14,24 @@ In Amazon DynamoDB, a partition key and sort key together form a composite prima
 
 Created different folders for postgreSQL scripts and DynamoDB scripts.
 
-Added boto3 library to requirements.txt file.
+Added boto3 library(the AWS SDK for Python to create, configure, and manage AWS services such as DynamoDB) to requirements.txt file.
 
 The utility scripts were created that would:
- - load schema for our tables in dynamoDB 
- - dropping cruddur messages table
+ - load schema for our tables in dynamoDB ![Screenshot (2204)](https://user-images.githubusercontent.com/92152669/231132629-f7d22578-bd8a-4bde-9296-39cd3377c9cc.png)
+
+ - dropping cruddur messages table ![Screenshot (2203)](https://user-images.githubusercontent.com/92152669/231132374-53cb1ff0-bc3a-4f87-9eec-0bf400fefe97.png)
+
  - scanning the table
- - seeding data to our table
- - list tables in DynamoDB
+ - seeding data to our table ![Screenshot (2202)](https://user-images.githubusercontent.com/92152669/231132056-077e4031-69cc-4bfe-ae46-bcc7ad25a3c1.png)
+
+ - list tables in DynamoDB ![Screenshot (2205)](https://user-images.githubusercontent.com/92152669/231132822-64823734-a14f-4381-9aff-3dd916986170.png)
+
+ - patterns to get and list conversations ![Screenshot (2206)](https://user-images.githubusercontent.com/92152669/231133147-6fd5f643-5c00-456b-8ec4-b3a6c786ddeb.png)
 
 
+The scripts can be found [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/tree/main/backend-flask/bin/ddb)
 
-
-The file ([**update_cognito_user_ids**](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db/update_cognito_user_ids)) must be created. The script adds the cognito user id.
+To populate the cognito_user_uuid that is present in our seed database as mock as seen [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/seed.sql), a script to list cognito users was added.[script](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/cognito/list-users)
 
 Make sure to add **boto3** into **backend-flask/requirements.txt**, which is the AWS SDK for Python to create, configure, and manage AWS services such as DynamoDB.
 
@@ -38,24 +43,7 @@ Create [backend-flask/bin/cognito/list-users](https://github.com/dontworryjohn/a
 
 On **docker-compose.yml** insert if not exist the following **CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"** and comment #CONNECTION_URL: "${PROD_CONNECTION_URL}". This week we wont use RDS.
 
-# Implementations
 
-## DynamoDB Scripts
-In this section, it is listed the main scripts used during the development (local and production)
-
-- **./bin/ddb/drop** ([code](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/ddb/drop)): This script allows to drop dynamo db table
-
-- **./bin/ddb/list-tables** ([code](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/ddb/drop)): This script allows the list of the table that has been created.
-
-- **./bin/ddb/scan**  ([code](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/ddb/scan)): This script shows all the items inside of the table.
-
-- **./bin/ddb/schema-load** ([code](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/ddb/schema-load)): This script allows the creation of the dynamodb **cruddur-messages** either locally or in production
-
-- **./bin/ddb/seed** ([code](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/ddb/schema-load)): This script loads some mock data inside the table with hardcoded **message_group_uuid**
-(Note: The **my_handle** and **other_handle** were replaced with 2 users that are avaialble on cognito user pool. the **created_at** was modified as it could cause error if you create a new message.)
-
-NB: Make sure to do the 
-**Chmod u+x** for the new scripts
 
 ## Implementation of Messages with the local DynamoDB
 
