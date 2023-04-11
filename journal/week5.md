@@ -15,6 +15,7 @@ In Amazon DynamoDB, a partition key and sort key together form a composite prima
 Created different folders for postgreSQL scripts and DynamoDB scripts.
 
 Added boto3 library(the AWS SDK for Python to create, configure, and manage AWS services such as DynamoDB) to requirements.txt file.
+In the postCreateCommand of DevConatiner the command to add the boto3 library was inserted.
 
 The utility scripts were created that would:
  - load schema for our tables in dynamoDB ![Screenshot (2204)](https://user-images.githubusercontent.com/92152669/231132629-f7d22578-bd8a-4bde-9296-39cd3377c9cc.png)
@@ -33,11 +34,9 @@ The scripts can be found [here](https://github.com/Gathu17/aws-bootcamp-cruddur-
 
 To populate the cognito_user_uuid that is present in our seed database as mock as seen [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/seed.sql), a script to list cognito users was added.[script](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/cognito/list-users)
 
-Make sure to add **boto3** into **backend-flask/requirements.txt**, which is the AWS SDK for Python to create, configure, and manage AWS services such as DynamoDB.
+The script the cognito_user_id column in the table as seen [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db/update_cognito_user_ids) was ran. 
+![Screenshot (2207)](https://user-images.githubusercontent.com/92152669/231137274-377d76ce-636c-4ea4-b7b8-e81c8ed50362.png)
 
-Add in .gitpod.yml the following ([code](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/commit/549f34baa8e09bbe51d65a5f87e49c1462afe2a0)). This allows to install python libraries automatically whenever a new workspace is launched.
-
-Update **backend-flask/db/seed.sql** with the following [**code**](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/seed.sql)). The new query contains information that are inside the cognito user pool. Therefore update with your information.
 
 Create [backend-flask/bin/cognito/list-users](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/cognito/list-users)). to list users data saved in AWS Cognito
 
