@@ -114,25 +114,65 @@ The codes in backend services ```messages.py``` was modified to list conversatio
 ![Screenshot (2216)](https://user-images.githubusercontent.com/92152669/231453840-5f3ff438-27b1-40a6-bef5-c8a76f075dd7.png)
 
 
-To create a new message, modify the content for body in frontend-react-js/src/components/MessageForm.js. Update the create_message.py module in backend services and , 
+To create a new message, modify the content for body in frontend-react-js/src/components/MessageForm.js. Update the create_message.py module in backend services and 
+add api endpoint in ```app.py```
+```
+@app.route("/api/messages", methods=['POST','OPTIONS'])
+@cross_origin()
+def data_create_message():
+  message_group_uuid   = request.json.get('message_group_uuid',None)
+  user_receiver_handle = request.json.get('handle',None)
+  message = request.json['message']
+  access_token = extract_access_token(request.headers)
 
-
-Create backend-flask/db/sql/users/create_message_users.sql.
-
-For additional pages, use create_message_group of the Ddb class. In frontend-react-js/src/App.js, import MessageGroupNewPage and add the corresponding router.
-
-Create frontend-react-js/src/pages/MessageGroupNewPage.js and frontend-react-js/src/components/MessageGroupNewItem.js.
-
-Add the endpoint and function for user short in backend-flask/app.py, create backend-flask/services/users_short.py and backend-flask/db/sql/users/short.sql.
-
-Finally, update frontend-react-js/src/components/MessageGroupFeed.js and frontend-react-js/src/components/MessageForm.js.
-
-
-
-
-## Implementation DynamoDB Data Stream to update message groups
+  try:
+    claims = cognito_jwt_token.verify(access_token)
+    # authenicatied request
+    app.logger.debug("authenicated")
+    app.logger.debug(claims)
+    cognito_user_id = claims['sub']
+    if message_group_uuid == None:
+      # Create for the first time
+      model = CreateMessage.run(
+        mode="create",
+        message=message,
+        cognito_user_id=cognito_user_id,
+        user_receiver_handle=user_receiver_handle
+      )
+    else:
+      # Push onto existing Message Group
+      model = CreateMessage.run(
+        mode="update",
+        message=message,
+        message_group_uuid=message_group_uuid,
+        cognito_user_id=cognito_user_id
+      )
+    if model['errors'] is not None:
+      return model['errors'], 422
+    else:
+      return model['data'], 200
+  except TokenVerifyError as e:
+    # unauthenicatied request
+    app.logger.debug(e)
+    return {}, 401
+    
+    
+```
  
-Before creating the new DynamoDB table, replace the new code for the script **/bin/ddb/schema-load** and make sure the **AWS_ENDPOINT_URL: "http://dynamodb-local:8000"** from the **docker-compose.yml** is commented.
+![created message](https://user-images.githubusercontent.com/92152669/231454638-a25727dd-9e6e-49a3-963a-5a6bd80031a1.png)
+Next would be to create a new conversation. A new user was added to in our seed.sql file. 
+
+
+Added [create_message_users.sql](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/sql/users/create_message_users.sql)
+In our frontend add a newe route ```/new/:handle``` for the new conversation.
+
+
+
+
+
+## Implementating DynamoDB Data Stream to update message groups
+ 
+Before creating the new DynamoDB table, replace the new code for the script ```/bin/ddb/schema-load``` and make sure the AWS_ENDPOINT_URL: "http://dynamodb-local:8000" from the **docker-compose.yml** is commented or removed.
 
 ```
 #!/usr/bin/env python3
@@ -210,23 +250,20 @@ response = ddb.create_table(
 print(response)
 ```
 
-Create the table using the script. This will create the dynamodb in your aws account. 
+Create the table using the script. This will create the dynamodb in aws account. 
 
 ```
 /bin/ddb/schema-load prod
 ```
-Note: If you returns the error **table already exists: cruddur-messages**, that means the table is already created in your account. if you dont see the table, make sure you are in the right region.
-Once created the table, active the **DynamoDB Stream**.
-From the table, go to the tab **Exports and streams**>Section **DynamoDB stream details** click active>Select **New image**
-**
 
 
-The next steps is to create the endpoint.
-To do please follow the instruction in the [link](https://scribehow.com/shared/Amazon_Workflow__9knsACwST_equLV8dYYa9A).
 
-Once you create the endpoint, next to do is to create the lambda fuction.
 
-Use the following code for the lambda function:
+ To create the VPC endpoint  follow the instruction in the [link](https://scribehow.com/shared/Amazon_Workflow__9knsACwST_equLV8dYYa9A).
+
+A new lambda function was also created. For the role, the permissions for ```AWSLambdaInvocation-DynamoDB``` and ```AWSDynamoDBFullAccess must be attached. **NB** Add the trigger to our Amazon DynamoDB database. Also make sure to turn on data streams from the tab **Exports and streams**
+
+Once the lambda function is created the following code was added.
 ```
 import json
 import boto3
@@ -234,8 +271,8 @@ from boto3.dynamodb.conditions import Key, Attr
 
 dynamodb = boto3.resource(
  'dynamodb',
- region_name='YOURREGION',
- endpoint_url="http://dynamodb.YOURREGION.amazonaws.com"
+ region_name='YOUR_REGION',
+ endpoint_url="http://dynamodb.YOUR_REGION.amazonaws.com"
 )
 
 def lambda_handler(event, context):
@@ -283,9 +320,5 @@ Note: from the following  region_name='YOURREGION',
 
 Follow the instruction to create the [lambda, role and trigger](https://scribehow.com/shared/How_to_create_a_Lambda_function_with_VPC_and_DynamoDB_triggers__EPcZPPH8T7SW8Yn5zsdAqw).
 
+![Screenshot (2218)](https://user-images.githubusercontent.com/92152669/231460531-41b5dfc2-7038-472c-9064-90129fc0a0b0.png)
 
-
-Reference
-- Contino.Io
-- AWS Documentation
-- [Ashish Video Cloud Security Podcast](https://www.youtube.com/watch?v=gFPljPNnK2Q&list=PLBfufR7vyJJ7k25byhRXJldB5AiwgNnWv&index=51)
