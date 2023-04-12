@@ -1,6 +1,6 @@
 # Week 5 — DynamoDB and Serverless Caching
 
-# BynamoDB modelling
+# DynamoDB modelling
 
 The following chart describes the model for our cruddur app
 ![Screenshot (2201)](https://user-images.githubusercontent.com/92152669/231102379-9e4a01dd-56a4-45c9-ac89-a14db0718e87.png)
@@ -14,60 +14,73 @@ In Amazon DynamoDB, a partition key and sort key together form a composite prima
 
 Created different folders for postgreSQL scripts and DynamoDB scripts.
 
-For each postgres script, the folder will be the following:
+Added boto3 library(the AWS SDK for Python to create, configure, and manage AWS services such as DynamoDB) to requirements.txt file.
+In the postCreateCommand of DevConatiner the command to add the boto3 library was inserted.
+
+The utility scripts were created that would:
+ - load schema for our tables in dynamoDB ![Screenshot (2204)](https://user-images.githubusercontent.com/92152669/231132629-f7d22578-bd8a-4bde-9296-39cd3377c9cc.png)
+
+ - dropping cruddur messages table ![Screenshot (2203)](https://user-images.githubusercontent.com/92152669/231132374-53cb1ff0-bc3a-4f87-9eec-0bf400fefe97.png)
+
+ - scanning the table
+ - seeding data to our table ![Screenshot (2202)](https://user-images.githubusercontent.com/92152669/231132056-077e4031-69cc-4bfe-ae46-bcc7ad25a3c1.png)
+
+ - list tables in DynamoDB ![Screenshot (2205)](https://user-images.githubusercontent.com/92152669/231132822-64823734-a14f-4381-9aff-3dd916986170.png)
+
+ - patterns to get and list conversations ![Screenshot (2206)](https://user-images.githubusercontent.com/92152669/231133147-6fd5f643-5c00-456b-8ec4-b3a6c786ddeb.png)
+
+
+The scripts can be found [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/tree/main/backend-flask/bin/ddb)
+
+To populate the cognito_user_uuid that is present in our seed database as mock as seen [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/seed.sql), a script to list cognito users was added.[script](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/cognito/list-users)
+
+The script that populated cognito_user_id column in the table is seen [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db/update_cognito_user_ids) was ran. 
+![Screenshot (2207)](https://user-images.githubusercontent.com/92152669/231137274-377d76ce-636c-4ea4-b7b8-e81c8ed50362.png)
+
+**NB** The CONNECTION_URL in docker-compose should point to postgres database being used.
+
+
+
+## Creating messages and message groups in DynamoDB
+
+The following file was added [backend-flask/lib/ddb.py](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/lib/ddb.py). 
+Make sure to add **AWS_ENDPOINT_URL: "http://dynamodb-local:8000"** inside the **docker-compose.yml**.
+The ``` Ddb.py ``` contains class Ddb with methods to 
+ - list message grups
+ - list messages
+ - create message
+ - create message group
+ 
+The slass is used in our backend service for message groups [here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/message_groups.py)
+Here my_user_uuid is used to fetch the message group linked to that users uuid. The SQL script to fetch users.uuid using the cognito_user_id was added as shown
+[here](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/sql/users/uuid_from_cognito_user_id.sql)
+
+Make sure to also add the message groups api in ```app.py```.
 ```
-backend-flask/bin/db-connect → backend-flask/bin/db/connect
-backend-flask/bin/db-create → backend-flask/bin/db/create
-backend-flask/bin/db-drop → backend-flask/bin/db/drop
-backend-flask/bin/db-schema-load → backend-flask/bin/db/schema-load
-backend-flask/bin/db-seed → backend-flask/bin/db/seed
-backend-flask/bin/db-sessions → backend-flask/bin/db/sessions
-backend-flask/bin/db-setup → backend-flask/bin/db/setup
-
+@app.route("/api/message_groups", methods=['GET'])
+def data_message_groups():
+  access_token = extract_access_token(request.headers)
+  try:
+    claims = cognito_jwt_token.verify(access_token)
+    # authenicatied request
+    app.logger.debug("authenicated")
+    app.logger.debug(claims)
+    cognito_user_id = claims['sub']
+    model = MessageGroups.run(cognito_user_id=cognito_user_id)
+    if model['errors'] is not None:
+      return model['errors'], 422
+    else:
+      return model['data'], 200
+  except TokenVerifyError as e:
+    # unauthenicatied request
+    app.logger.debug(e)
+    return {}, 401
+   
 ```
+#### Frontend implementation
+Created module in the util folder that checks if users is authenticated. 
 
-Note: Inside the file **backend-flask/bin/db/setup** we added the following code 
 
-```
-python "$bin_path/db/update_cognito_user_ids"
-```
-The file ([**update_cognito_user_ids**](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db/update_cognito_user_ids)) must be created. The script adds the cognito user id.
-
-Make sure to add **boto3** into **backend-flask/requirements.txt**, which is the AWS SDK for Python to create, configure, and manage AWS services such as DynamoDB.
-
-Add in .gitpod.yml the following ([code](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/commit/549f34baa8e09bbe51d65a5f87e49c1462afe2a0)). This allows to install python libraries automatically whenever a new workspace is launched.
-
-Update **backend-flask/db/seed.sql** with the following [**code**](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/seed.sql)). The new query contains information that are inside the cognito user pool. Therefore update with your information.
-
-Create [backend-flask/bin/cognito/list-users](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/cognito/list-users)). to list users data saved in AWS Cognito
-
-On **docker-compose.yml** insert if not exist the following **CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"** and comment #CONNECTION_URL: "${PROD_CONNECTION_URL}". This week we wont use RDS.
-
-# Implementations
-
-## DynamoDB Scripts
-In this section, it is listed the main scripts used during the development (local and production)
-
-- **./bin/ddb/drop** ([code](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/ddb/drop)): This script allows to drop dynamo db table
-
-- **./bin/ddb/list-tables** ([code](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/ddb/drop)): This script allows the list of the table that has been created.
-
-- **./bin/ddb/scan**  ([code](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/ddb/scan)): This script shows all the items inside of the table.
-
-- **./bin/ddb/schema-load** ([code](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/ddb/schema-load)): This script allows the creation of the dynamodb **cruddur-messages** either locally or in production
-
-- **./bin/ddb/seed** ([code](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/ddb/schema-load)): This script loads some mock data inside the table with hardcoded **message_group_uuid**
-(Note: The **my_handle** and **other_handle** were replaced with 2 users that are avaialble on cognito user pool. the **created_at** was modified as it could cause error if you create a new message.)
-
-NB: Make sure to do the 
-**Chmod u+x** for the new scripts
-
-## Implementation of Messages with the local DynamoDB
-
-Create the following file [**backend-flask/lib/ddb.py](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/blob/main/backend-flask/lib/ddb.py). 
-Make sure to create **AWS_ENDPOINT_URL: "http://dynamodb-local:8000"** inside the **docker-compose.yml**.
-
-For additional changes from the backend see the [repo](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/commits/main/backend-flask)  and frontent [repo](https://github.com/dontworryjohn/aws-bootcamp-cruddur-2023/commits/main/frontend-react-js)
 
 To retrieve messages and message groups from Dynamodb instead of using hard-coded data, modify the backend routes and functions. Rather than passing in a handle, use message_group_uuid. The Ddb class's list_message_groups and list_messages are mainly used for these implementations.
 
