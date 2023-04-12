@@ -78,23 +78,44 @@ def data_message_groups():
    
 ```
 #### Frontend implementation
-Created module in the util folder that checks if users is authenticated. 
+Created module in the util folder that checks if users is authenticated. [checkAuth](https://github.com/Gathu17/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/util/checkAuth.js)
+
+The folder is imported into ```MessageGroupPage.js``` , ```MessageGroupsPage``` and ```HomeFeedPage.js```.
+
+The message_group_uuid was passed to the ```MessageGroupPage.js``` file as params to our backend url..
+In the backend a new api was used that selected the message_group using the params set
+```
+@app.route("/api/messages/<string:message_group_uuid>", methods=['GET'])
+def data_messages(message_group_uuid):
+  access_token = extract_access_token(request.headers)
+  try:
+    claims = cognito_jwt_token.verify(access_token)
+    # authenicatied request
+    app.logger.debug("authenicated")
+    app.logger.debug(claims)
+    cognito_user_id = claims['sub']
+    model = Messages.run(
+        cognito_user_id=cognito_user_id,
+        message_group_uuid=message_group_uuid
+      )
+    if model['errors'] is not None:
+      return model['errors'], 422
+    else:
+      return model['data'], 200
+  except TokenVerifyError as e:
+    # unauthenicatied request
+    app.logger.debug(e)
+    return {}, 401
+```
+
+In frontend-react-js/src/components/MessageGroupItem.js,props.message_group.handle was changed to props.message_group.uuid and params.handle to params.message_group_uuid.
+
+The codes in backend services ```messages.py``` was modified to list conversation that have the message_group_uuid
+![Screenshot (2216)](https://user-images.githubusercontent.com/92152669/231453840-5f3ff438-27b1-40a6-bef5-c8a76f075dd7.png)
 
 
+To create a new message, modify the content for body in frontend-react-js/src/components/MessageForm.js. Update the create_message.py module in backend services and , 
 
-To retrieve messages and message groups from Dynamodb instead of using hard-coded data, modify the backend routes and functions. Rather than passing in a handle, use message_group_uuid. The Ddb class's list_message_groups and list_messages are mainly used for these implementations.
-
-Make the following changes in backend-flask/app.py: replace "/api/messages/@string:handle" with "/api/messages/string:message_group_uuid".
-
-Also, make modifications in the backend-flask/services/message_groups.py and backend-flask/services/messages.py files.
-
-In the frontend-react-js/src/pages/MessageGroupPage.js, update the backend_url to use ${params.message_group_uuid} instead of ${handle}, and in frontend-react-js/src/App.js, change the path from "/messages/@:handle" to "/messages/:message_group_uuid".
-
-In frontend-react-js/src/components/MessageGroupItem.js, change props.message_group.handle to props.message_group.uuid and params.handle to params.message_group_uuid.
-
-For authentication, create a reusable script in frontend-react-js/src/lib/CheckAuth.js, which can be used in frontend-react-js/src/pages/HomeFeedPage.js, frontend-react-js/src/pages/MessageGroupPage.js, frontend-react-js/src/pages/MessageGroupsPage.js, and frontend-react-js/src/components/MessageForm.js.
-
-To create a new message, modify the content for body in frontend-react-js/src/components/MessageForm.js. Update the data_create_message function in backend-flask/app.py and backend-flask/services/create_message.py, which has two modes - "update" to a new message group or "create" a new message with a new message group.
 
 Create backend-flask/db/sql/users/create_message_users.sql.
 
