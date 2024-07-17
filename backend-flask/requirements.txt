@@ -20,3 +20,4 @@ psycopg[pool]
 aws-psycopg2
 
 boto3
+setuptools>=70.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
